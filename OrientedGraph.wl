@@ -8,13 +8,13 @@
 (*Maxim Piskunov*)
 
 
-BeginPackage["OrientedGraph`"]
+BeginPackage["OrientedGraph`"];
 
 
-Begin["OrientedGraph`Private`"]
+Begin["OrientedGraph`Private`"];
 
 
-End[]
+End[];
 
 
 EndPackage[]
