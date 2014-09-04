@@ -83,6 +83,20 @@ OrientedGraphPort[2, vertexIndex_ ?(IntegerQ[#] && # > 0 &), portIndex_ ? (Integ
 	Message[OrientedGraphPort::intoutport, 1, vertexIndex, portIndex]
 
 
+(* ::Subsection:: *)
+(*Standard Form*)
+
+
+$OrientedGraphPortColor[OrientedGraphPort[type_, vertexIndex_, slotIndex_]] := If[type == 2, Black, ColorData[97, slotIndex]]
+
+
+OrientedGraphPort /: MakeBoxes[OrientedGraphPort[type_ ? (MatchQ[1|2]), vertexIndex_Integer, portIndex_ ? (MatchQ[1|2|3])], StandardForm] /;
+	vertexIndex > 0 && (type == 1 || portIndex == 1) :=
+	With[{portLabel = ToBoxes @ Style[vertexIndex, $OrientedGraphPortColor @ OrientedGraphPort[type, vertexIndex, portIndex]]},
+		InterpretationBox[portLabel, OrientedGraphPort[type, vertexIndex, portIndex]]
+	]
+
+
 End[];
 
 
