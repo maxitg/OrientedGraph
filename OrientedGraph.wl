@@ -1,7 +1,7 @@
 (* ::Package:: *)
 
 (* ::Title:: *)
-(*Planar Network Systems*)
+(*Oriented Graph*)
 
 
 (* ::Subtitle:: *)
