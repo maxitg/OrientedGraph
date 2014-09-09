@@ -28,6 +28,9 @@ OrientedGraph::usage = StringJoin @ Riffle[{
 	"OrientedGraph[{\!\(\*SubscriptBox[\(e\), \(1\)]\), \!\(\*SubscriptBox[\(e\), \(2\)]\), \[Ellipsis]}] yields a graph with edges \!\(\*SubscriptBox[\(e\), \(i\)]\)."
 }, "\n"];
 
+
+OrientedGraphQ::usage = StringJoin @ Riffle[{
+	"OrientedGraphQ[g] yields True if g is a valid OrientedGraph object and False otherwise."
 }, "\n"];
 
 
