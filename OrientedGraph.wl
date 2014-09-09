@@ -48,8 +48,8 @@ OrientedGraphPort::posport = "Second argument in OrientedGraphPort[`1`, `2`] is 
 OrientedGraphPort::toolargeport = "Only oriented graphs with 3 ports per vertex are supported.";
 
 
-OrientedGraphPort[args___] := 0 /; !Length @ {args} != 2 &&
-	Message[OrientedGraphPort::argx, Length @ {args}]
+OrientedGraphPort[args___] := 0 /; Length @ {args} != 2 &&
+	Message[OrientedGraphPort::argx, Length @ {args}], False
 
 OrientedGraphPort[vertexIndex_ ? (NumericQ[#] && !IntegerQ[#] &), portIndex_] := 0 /;
 	Message[OrientedGraphPort::intvert, vertexIndex, portIndex]
