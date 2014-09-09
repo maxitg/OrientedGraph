@@ -81,6 +81,27 @@ OrientedGraphPort /: MakeBoxes[OrientedGraphPort[vertexIndex_Integer, portIndex_
 	]
 
 
+(* ::Section:: *)
+(*Outgoing Oriented Graph Port*)
+
+
+(* ::Subsection:: *)
+(*Consistency checks*)
+
+
+OutgoingOrientedGraphPort::argx = "OrientedGraphPort called with `1` arguments; 1 argument are expected.";
+OutgoingOrientedGraphPort::int = "Argument `1` in OrientedGraphPort[`1`] is not an integer.";
+OutgoingOrientedGraphPort::pos = "Argument `1` in OrientedGraphPort[`1`] is not positive.";
+
+
+OutgoingOrientedGraphPort[args___] := 0 /; Length @ {args} != 1 &&
+	Message[OutgoingOrientedGraphPort::argx, Length @ {args}]
+
+OutgoingOrientedGraphPort[vertexIndex_ ? (NumericQ[#] && !IntegerQ[#] &)] := 0 /;
+	Message[OutgoingOrientedGraphPort::int, vertexIndex]
+
+OutgoingOrientedGraphPort[vertexIndex_ ? (NumericQ[#] && IntegerQ[#] && # <= 0 &)] := 0 /;
+	Message[OutgoingOrientedGraphPort::pos, vertexIndex]
 
 
 (* ::Subsection:: *)
