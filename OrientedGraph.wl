@@ -143,6 +143,47 @@ $ToCanonicalPort[port_] := port /. {
 $ToCanonicalEdge[edge_] := $ToCanonicalPort /@ (edge[[1]] <-> edge[[2]])
 
 
+(* ::Subsection:: *)
+(*Consistency checks*)
+
+
+$PortsList[edges_List] := Flatten[List @@ # & /@ Map[$ToCanonicalPort, edges, {2}]]
+
+
+$MaxVertexIndex[ports_List] := Max[ports[[All, 1]]]
+
+
+$CompletePortsListQ[ports_] := Length @ Union[ports] == 3 $MaxVertexIndex @ ports
+
+
+$CompleteOutgoingPortsListQ[ports_] := Length @ Union[ports] == $MaxVertexIndex @ ports
+
+
+$CompleteEdgesListQ[edges_] := With[
+	{
+		portsList = $PortsList @ edges
+	},
+	$CompletePortsListQ[#] && DuplicateFreeQ[#] & @ Select[Head @ # == OrientedGraphPort &] @ portsList &&
+	$CompleteOutgoingPortsListQ[#] && DuplicateFreeQ[#] & @ Select[Head @ # == OutgoingOrientedGraphPort &] @ portsList
+]
+
+
+OrientedGraph[edges_List] /; (
+	AllTrue[
+		MatchQ[Head[#], UndirectedEdge | List] &&
+		AllTrue[$PortQ @ # &] @ # &
+	] @ # && $CompleteEdgesListQ @ # & @ edges
+) := Module[
+	{
+		canonicalEdges = $ToCanonicalEdge /@ edges,
+		maxVertexIndex = $MaxVertexIndex @ Select[Head @ # == OrientedGraphPort &] @ $PortsList @ edges,
+		directionsList
+	},
+	directionsList = (Sort @ Join[canonicalEdges, Reverse /@ canonicalEdges])[[All, 2]];
+	OrientedGraph @ {Partition[#[[ ;; 3 maxVertexIndex]], 3], Partition[#[[3 maxVertexIndex + 1 ;; ]], 1]} & @ directionsList
+]
+
+
 End[];
 
 
