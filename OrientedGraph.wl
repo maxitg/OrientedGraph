@@ -115,6 +115,19 @@ OutgoingOrientedGraphPort /: MakeBoxes[OutgoingOrientedGraphPort[vertexIndex_Int
 	]
 
 
+(* ::Section:: *)
+(*Oriented Graph*)
+
+
+(* ::Subsection:: *)
+(*$PortQ*)
+
+
+$PortQ[head_ ? (MatchQ[OrientedGraphPort | Subscript | List])[vertexIndex_Integer ? (# > 0 &), portIndex_ ? (MatchQ[1|2|3])]] := True
+
+$PortQ[head_ ? (MatchQ[OutgoingOrientedGraphPort | Slot]) @ x_Integer ? (# > 0 &)] := True
+
+$PortQ[arg___] := False
 
 
 End[];
