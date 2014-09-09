@@ -106,9 +106,10 @@ End[];
 
 
 Attributes[OrientedGraphPort] = {ReadProtected};
+Attributes[OrientedGraph] = {ReadProtected};
 
 
-Protect[OrientedGraphPort];
+Protect[OrientedGraphPort, OrientedGraph];
 
 
 EndPackage[]
