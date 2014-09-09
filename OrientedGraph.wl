@@ -49,7 +49,7 @@ OrientedGraphPort::toolargeport = "Only oriented graphs with 3 ports per vertex 
 
 
 OrientedGraphPort[args___] := 0 /; Length @ {args} != 2 &&
-	Message[OrientedGraphPort::argx, Length @ {args}], False
+	Message[OrientedGraphPort::argx, Length @ {args}]
 
 OrientedGraphPort[vertexIndex_ ? (NumericQ[#] && !IntegerQ[#] &), portIndex_] := 0 /;
 	Message[OrientedGraphPort::intvert, vertexIndex, portIndex]
