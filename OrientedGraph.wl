@@ -11,7 +11,7 @@
 BeginPackage["OrientedGraph`"];
 
 
-Unprotect[OrientedGraphPort, OrientedGraph, OutgoingOrientedGraphPort];
+Unprotect[OrientedGraphPort, OrientedGraph, OutgoingOrientedGraphPort, OrientedGraphQ];
 
 
 OrientedGraphPort::usage = StringJoin @ Riffle[{
@@ -195,9 +195,10 @@ End[];
 Attributes[OrientedGraphPort] = {ReadProtected};
 Attributes[OrientedGraph] = {ReadProtected};
 Attributes[OutgoingOrientedGraphPort] = {ReadProtected};
+Attributes[OrientedGraphQ] = {ReadProtected};
 
 
-Protect[OrientedGraphPort, OrientedGraph, ReadProtected];
+Protect[OrientedGraphPort, OrientedGraph, ReadProtected, OrientedGraphQ];
 
 
 EndPackage[]
