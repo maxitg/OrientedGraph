@@ -105,6 +105,14 @@ OutgoingOrientedGraphPort[vertexIndex_ ? (NumericQ[#] && IntegerQ[#] && # <= 0 &
 
 
 (* ::Subsection:: *)
+(*Standard Form*)
+
+
+OutgoingOrientedGraphPort /: MakeBoxes[OutgoingOrientedGraphPort[vertexIndex_Integer], StandardForm] /;
+	vertexIndex > 0 :=
+	With[{portLabel = ToBoxes @ Slot @ vertexIndex},
+		InterpretationBox[portLabel, OutgoingOrientedGraphPort[vertexIndex]]
+	]
 
 
 
