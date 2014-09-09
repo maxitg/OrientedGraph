@@ -14,24 +14,29 @@ BeginPackage["OrientedGraph`"];
 Unprotect[OrientedGraphPort, OrientedGraph, OutgoingOrientedGraphPort, OrientedGraphQ];
 
 
-OrientedGraphPort::usage = StringJoin @ Riffle[{
-	"OrientedGraphPort[v, i] yields the i-th port (that is an outlet to which edge connects) of the v-th vertex of an oriented graph."
-}, "\n"];
+OrientedGraphPort::usage = StringJoin @ {
+	"OrientedGraphPort[\!\(\*StyleBox[\(v\), \"TI\"]\), \!\(\*StyleBox[\(p\), \"TI\"]\)] ",
+	"yields the \!\(\*SuperscriptBox[StyleBox[\(p\), \"TI\"], th]\) port (that is an outlet to which edge connects) ",
+	"of the \!\(\*SuperscriptBox[StyleBox[\(v\), \"TI\"], th]\) vertex of an oriented graph."
+};
 
 
-OutgoingOrientedGraphPort::usage = StringJoin @ Riffle[{
-	"OutgoingOrientedGraphPort[i] yields the i-th outgoing port (that is an outlet which is free) of an oriented graph."
-}, "\n"];
+OutgoingOrientedGraphPort::usage = StringJoin @ {
+	"OutgoingOrientedGraphPort[\!\(\*StyleBox[\(p\), \"TI\"]\)] ",
+	" yields the \!\(\*SuperscriptBox[StyleBox[\(p\), \"TI\"], th]\) outgoing port (that is an outlet which is free) of an oriented graph."
+};
 
 
-OrientedGraph::usage = StringJoin @ Riffle[{
-	"OrientedGraph[{\!\(\*SubscriptBox[\(e\), \(1\)]\), \!\(\*SubscriptBox[\(e\), \(2\)]\), \[Ellipsis]}] yields a graph with edges \!\(\*SubscriptBox[\(e\), \(i\)]\)."
-}, "\n"];
+OrientedGraph::usage = StringJoin @ {
+	"OrientedGraph[",
+		"{\!\(\*SubscriptBox[StyleBox[\(e\), \"TI\"], StyleBox[\(1\), \"TR\"]]\)",
+		"\!\(\*SubscriptBox[StyleBox[\(e\), \"TI\"], StyleBox[\(2\), \"TR\"]]\), \[Ellipsis]}",
+	"] yields a graph with edges \!\(\*SubscriptBox[StyleBox[\(e\), \"TI\"], StyleBox[\(i\), \"TI\"]]\)."
+};
 
 
-OrientedGraphQ::usage = StringJoin @ Riffle[{
-	"OrientedGraphQ[g] yields True if g is a valid OrientedGraph object and False otherwise."
-}, "\n"];
+OrientedGraphQ::usage =
+	"OrientedGraphQ[\!\(\*StyleBox[\(g\), \"TI\"]\)] yields True if \!\(\*StyleBox[\(g\), \"TI\"]\) is a valid OrientedGraph object and False otherwise."
 
 
 Begin["OrientedGraph`Private`"];
