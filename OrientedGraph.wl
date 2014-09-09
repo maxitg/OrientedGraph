@@ -130,6 +130,19 @@ $PortQ[head_ ? (MatchQ[OutgoingOrientedGraphPort | Slot]) @ x_Integer ? (# > 0 &
 $PortQ[arg___] := False
 
 
+(* ::Subsection:: *)
+(*$ToCanonicalEdge*)
+
+
+$ToCanonicalPort[port_] := port /. {
+	Subscript | List -> OrientedGraphPort,
+	Slot -> OutgoingOrientedGraphPort
+}
+
+
+$ToCanonicalEdge[edge_] := $ToCanonicalPort /@ (edge[[1]] <-> edge[[2]])
+
+
 End[];
 
 
