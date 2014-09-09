@@ -15,17 +15,19 @@ Unprotect[OrientedGraphPort, OrientedGraph, OutgoingOrientedGraphPort];
 
 
 OrientedGraphPort::usage = StringJoin @ Riffle[{
-	"OrientedGraphPort[v, i] yields the i-th port (that is an outlet to which edge connects) of the v-th vertex of an oriented graph"
+	"OrientedGraphPort[v, i] yields the i-th port (that is an outlet to which edge connects) of the v-th vertex of an oriented graph."
 }, "\n"];
 
 
 OutgoingOrientedGraphPort::usage = StringJoin @ Riffle[{
-	"OutgoingOrientedGraphPort[i] yields the i-th outgoing port (that is an outlet which is free) of an oriented graph"
+	"OutgoingOrientedGraphPort[i] yields the i-th outgoing port (that is an outlet which is free) of an oriented graph."
 }, "\n"];
 
 
 OrientedGraph::usage = StringJoin @ Riffle[{
-	"OrientedGraph[{\!\(\*SubscriptBox[\(e\), \(1\)]\), \!\(\*SubscriptBox[\(e\), \(2\)]\), \[Ellipsis]}] yields a graph with edges \!\(\*SubscriptBox[\(e\), \(i\)]\)"
+	"OrientedGraph[{\!\(\*SubscriptBox[\(e\), \(1\)]\), \!\(\*SubscriptBox[\(e\), \(2\)]\), \[Ellipsis]}] yields a graph with edges \!\(\*SubscriptBox[\(e\), \(i\)]\)."
+}, "\n"];
+
 }, "\n"];
 
 
