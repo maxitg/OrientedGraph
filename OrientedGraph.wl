@@ -154,44 +154,82 @@ $ToCanonicalEdge[edge_] := $ToCanonicalPort /@ (edge[[1]] <-> edge[[2]])
 
 
 (* ::Subsection:: *)
-(*Consistency checks*)
+(*$PortList*)
 
 
-$PortsList[edges_List] := Flatten[List @@ # & /@ Map[$ToCanonicalPort, edges, {2}]]
+$PortList[edges_List] := Flatten[List @@ # & /@ Map[$ToCanonicalPort, edges, {2}]]
 
 
-$MaxVertexIndex[ports_List] := Max[ports[[All, 1]]]
+$PortList[edges_List, head_] := Select[Head @ # == head &] @ $PortList[edges]
 
 
-$CompletePortsListQ[ports_] := Length @ Union[ports] == 3 $MaxVertexIndex @ ports
+(* ::Subsection:: *)
+(*$MaxVertexIndex and $MaxGraphPortIndex*)
 
 
-$CompleteOutgoingPortsListQ[ports_] := Length @ Union[ports] == $MaxVertexIndex @ ports
+$MaxVertexOrGraphPort[edges_List, head_] := Max[First /@ $PortList[edges, head]]
 
 
-$CompleteEdgesListQ[edges_] := With[
-	{
-		portsList = $PortsList @ edges
-	},
-	$CompletePortsListQ[#] && DuplicateFreeQ[#] & @ Select[Head @ # == OrientedGraphPort &] @ portsList &&
-	$CompleteOutgoingPortsListQ[#] && DuplicateFreeQ[#] & @ Select[Head @ # == OutgoingOrientedGraphPort &] @ portsList
-]
+$MaxVertexIndex[edges_List] := $MaxVertexOrGraphPort[edges, OrientedVertexPort]
 
 
-OrientedGraph[edges_List] /; (
+$MaxGraphPortIndex[edges_List] := $MaxVertexOrGraphPort[edges, OrientedGraphPort]
+
+
+(* ::Subsection:: *)
+(*$MissingPorts*)
+
+
+$MissingPorts[edges_List] :=
+	Complement[
+		Join[
+			OrientedVertexPort[#[[1]], #[[2]]] & /@ Tuples[{Range @ $MaxVertexIndex @ edges, Range @ 3}],
+			OrientedGraphPort[#] & /@ Range @ $MaxGraphPortIndex @ edges
+		],
+		$PortList @ edges
+	]
+
+
+(* ::Subsection:: *)
+(*$AllValidEdges*)
+
+
+$EdgesQ[edges_] :=
 	AllTrue[
 		MatchQ[Head[#], UndirectedEdge | List] &&
 		AllTrue[$PortQ @ # &] @ # &
-	] @ # && $CompleteEdgesListQ @ # & @ edges
-) := Module[
-	{
-		canonicalEdges = $ToCanonicalEdge /@ edges,
-		maxVertexIndex = $MaxVertexIndex @ Select[Head @ # == OrientedGraphPort &] @ $PortsList @ edges,
-		directionsList
-	},
-	directionsList = (Sort @ Join[canonicalEdges, Reverse /@ canonicalEdges])[[All, 2]];
-	OrientedGraph @ {Partition[#[[ ;; 3 maxVertexIndex]], 3], Partition[#[[3 maxVertexIndex + 1 ;; ]], 1]} & @ directionsList
-]
+	] @ edges
+
+
+(* ::Subsection:: *)
+(*Consistency checks*)
+
+
+OrientedGraph::argx = "OrientedGraph called with `1` arguments; 1 argument is expected.";
+OrientedGraph::dir = "Directed oriented graphs are not supported.";
+OrientedGraph::dup = "Port `1` in OrientedGraph[`2`] appears multiple times.";
+OrientedGraph::mport = "Port `1` in OrientedGraph[`2`] is missing.";
+
+
+OrientedGraph[args___] := 0 /; Length @ {args} != 1 &&
+	Message[OrientedGraph::argx, Length @ {args}]
+
+
+OrientedGraph[edges_List ? (AnyTrue[MatchQ[Head[#], DirectedEdge | Rule] &])] := 0 /; Message[OrientedGraph::dir]
+
+
+OrientedGraph[edges_List] := 0 /;
+	$EdgesQ @ edges && !DuplicateFreeQ @ $PortList @ edges &&
+	Message[OrientedGraph::dup, First @ Commonest @ $PortList @ edges, $ToCanonicalEdge /@ edges]
+
+
+OrientedGraph[edges_List] := 0 /; 
+	$EdgesQ @ edges && DuplicateFreeQ @ $PortList @ edges && $MissingPorts[edges] != {} &&
+	Message[OrientedGraph::mport, First @ $MissingPorts @ edges, $ToCanonicalEdge /@ edges]
+
+
+OrientedGraph[edges_List] := OrientedGraph[$ToCanonicalEdge /@ edges] /;
+	$EdgesQ @ edges && DuplicateFreeQ @ $PortList @ edges && $MissingPorts[edges] == {} && edges =!= $ToCanonicalEdge /@ edges
 
 
 End[];
