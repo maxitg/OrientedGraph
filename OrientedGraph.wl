@@ -11,18 +11,18 @@
 BeginPackage["OrientedGraph`"];
 
 
-Unprotect[OrientedGraphPort, OrientedGraph, OutgoingOrientedGraphPort, OrientedGraphQ];
+Unprotect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ];
 
 
-OrientedGraphPort::usage = StringJoin @ {
-	"OrientedGraphPort[\!\(\*StyleBox[\(v\), \"TI\"]\), \!\(\*StyleBox[\(p\), \"TI\"]\)] ",
+OrientedVertexPort::usage = StringJoin @ {
+	"OrientedVertexPort[\!\(\*StyleBox[\(v\), \"TI\"]\), \!\(\*StyleBox[\(p\), \"TI\"]\)] ",
 	"yields the \!\(\*SuperscriptBox[StyleBox[\(p\), \"TI\"], th]\) port (that is an outlet to which edge connects) ",
 	"of the \!\(\*SuperscriptBox[StyleBox[\(v\), \"TI\"], th]\) vertex of an oriented graph."
 };
 
 
-OutgoingOrientedGraphPort::usage = StringJoin @ {
-	"OutgoingOrientedGraphPort[\!\(\*StyleBox[\(p\), \"TI\"]\)] ",
+OrientedGraphPort::usage = StringJoin @ {
+	"OrientedGraphPort[\!\(\*StyleBox[\(p\), \"TI\"]\)] ",
 	" yields the \!\(\*SuperscriptBox[StyleBox[\(p\), \"TI\"], th]\) outgoing port (that is an outlet which is free) of an oriented graph."
 };
 
@@ -36,10 +36,59 @@ OrientedGraph::usage = StringJoin @ {
 
 
 OrientedGraphQ::usage =
-	"OrientedGraphQ[\!\(\*StyleBox[\(g\), \"TI\"]\)] yields True if \!\(\*StyleBox[\(g\), \"TI\"]\) is a valid OrientedGraph object and False otherwise."
+	"OrientedGraphQ[\!\(\*StyleBox[\(g\), \"TI\"]\)] yields True if \!\(\*StyleBox[\(g\), \"TI\"]\) is a valid OrientedGraph object and False otherwise.";
 
 
 Begin["OrientedGraph`Private`"];
+
+
+(* ::Section:: *)
+(*Oriented Vertex Port*)
+
+
+(* ::Subsection:: *)
+(*Consistency checks*)
+
+
+OrientedVertexPort::argx = "OrientedVertexPort called with `1` arguments; 2 arguments are expected.";
+OrientedVertexPort::intvert = "First argument in OrientedVertexPort[`1`, `2`] is not an integer.";
+OrientedVertexPort::posvert = "First argument in OrientedVertexPort[`1`, `2`] is not positive.";
+OrientedVertexPort::intport = "Second argument in OrientedVertexPort[`1`, `2`] is not an integer.";
+OrientedVertexPort::posport = "Second argument in OrientedVertexPort[`1`, `2`] is not positive.";
+OrientedVertexPort::toolargeport = "Only oriented graphs with 3 ports per vertex are supported.";
+
+
+OrientedVertexPort[args___] := 0 /; Length @ {args} != 2 &&
+	Message[OrientedVertexPort::argx, Length @ {args}]
+
+OrientedVertexPort[vertexIndex_ ? (NumericQ[#] && !IntegerQ[#] &), portIndex_] := 0 /;
+	Message[OrientedVertexPort::intvert, vertexIndex, portIndex]
+
+OrientedVertexPort[vertexIndex_ ? (NumericQ[#] && IntegerQ[#] && # <= 0 &), portIndex_] := 0 /;
+	Message[OrientedVertexPort::posvert, vertexIndex, portIndex]
+
+OrientedVertexPort[vertexIndex_ ? (IntegerQ[#] && # > 0 &), portIndex_ ? (NumericQ[#] && !IntegerQ[#] &)] := 0 /;
+	Message[OrientedVertexPort::intport, vertexIndex, portIndex]
+
+OrientedVertexPort[vertexIndex_ ? (IntegerQ[#] && # > 0 &), portIndex_ ? (NumericQ[#] && IntegerQ[#] && # <= 0 &)] := 0 /;
+	Message[OrientedVertexPort::posport, vertexIndex, portIndex]
+
+OrientedVertexPort[vertexIndex_ ?(IntegerQ[#] && # > 0 &), portIndex_ ? (IntegerQ[#] && # > 3 &)] := 0 /;
+	Message[OrientedVertexPort::toolargeport, 1, vertexIndex, portIndex]
+
+
+(* ::Subsection:: *)
+(*Standard Form*)
+
+
+$PortColor[OrientedVertexPort[vertexIndex_, slotIndex_]] := ColorData[97, slotIndex]
+
+
+OrientedVertexPort /: MakeBoxes[OrientedVertexPort[vertexIndex_Integer, portIndex_ ? (MatchQ[1|2|3])], StandardForm] /;
+	vertexIndex > 0 :=
+	With[{portLabel = ToBoxes @ Style[vertexIndex, $PortColor @ OrientedVertexPort[vertexIndex, portIndex]]},
+		InterpretationBox[portLabel, OrientedVertexPort[vertexIndex, portIndex]]
+	]
 
 
 (* ::Section:: *)
@@ -50,78 +99,29 @@ Begin["OrientedGraph`Private`"];
 (*Consistency checks*)
 
 
-OrientedGraphPort::argx = "OrientedGraphPort called with `1` arguments; 2 arguments are expected.";
-OrientedGraphPort::intvert = "First argument in OrientedGraphPort[`1`, `2`] is not an integer.";
-OrientedGraphPort::posvert = "First argument in OrientedGraphPort[`1`, `2`] is not positive.";
-OrientedGraphPort::intport = "Second argument in OrientedGraphPort[`1`, `2`] is not an integer.";
-OrientedGraphPort::posport = "Second argument in OrientedGraphPort[`1`, `2`] is not positive.";
-OrientedGraphPort::toolargeport = "Only oriented graphs with 3 ports per vertex are supported.";
+OrientedGraphPort::argx = "OrientedGraphPort called with `1` arguments; 1 argument is expected.";
+OrientedGraphPort::int = "Argument `1` in OrientedGraphPort[`1`] is not an integer.";
+OrientedGraphPort::pos = "Argument `1` in OrientedGraphPort[`1`] is not positive.";
 
 
-OrientedGraphPort[args___] := 0 /; Length @ {args} != 2 &&
+OrientedGraphPort[args___] := 0 /; Length @ {args} != 1 &&
 	Message[OrientedGraphPort::argx, Length @ {args}]
 
-OrientedGraphPort[vertexIndex_ ? (NumericQ[#] && !IntegerQ[#] &), portIndex_] := 0 /;
-	Message[OrientedGraphPort::intvert, vertexIndex, portIndex]
+OrientedGraphPort[vertexIndex_ ? (NumericQ[#] && !IntegerQ[#] &)] := 0 /;
+	Message[OrientedGraphPort::int, vertexIndex]
 
-OrientedGraphPort[vertexIndex_ ? (NumericQ[#] && IntegerQ[#] && # <= 0 &), portIndex_] := 0 /;
-	Message[OrientedGraphPort::posvert, vertexIndex, portIndex]
-
-OrientedGraphPort[vertexIndex_ ? (IntegerQ[#] && # > 0 &), portIndex_ ? (NumericQ[#] && !IntegerQ[#] &)] := 0 /;
-	Message[OrientedGraphPort::intport, vertexIndex, portIndex]
-
-OrientedGraphPort[vertexIndex_ ? (IntegerQ[#] && # > 0 &), portIndex_ ? (NumericQ[#] && IntegerQ[#] && # <= 0 &)] := 0 /;
-	Message[OrientedGraphPort::posport, vertexIndex, portIndex]
-
-OrientedGraphPort[vertexIndex_ ?(IntegerQ[#] && # > 0 &), portIndex_ ? (IntegerQ[#] && # > 3 &)] := 0 /;
-	Message[OrientedGraphPort::toolargeport, 1, vertexIndex, portIndex]
+OrientedGraphPort[vertexIndex_ ? (NumericQ[#] && IntegerQ[#] && # <= 0 &)] := 0 /;
+	Message[OrientedGraphPort::pos, vertexIndex]
 
 
 (* ::Subsection:: *)
 (*Standard Form*)
 
 
-$PortColor[OrientedGraphPort[vertexIndex_, slotIndex_]] := ColorData[97, slotIndex]
-
-
-OrientedGraphPort /: MakeBoxes[OrientedGraphPort[vertexIndex_Integer, portIndex_ ? (MatchQ[1|2|3])], StandardForm] /;
-	vertexIndex > 0 :=
-	With[{portLabel = ToBoxes @ Style[vertexIndex, $PortColor @ OrientedGraphPort[vertexIndex, portIndex]]},
-		InterpretationBox[portLabel, OrientedGraphPort[vertexIndex, portIndex]]
-	]
-
-
-(* ::Section:: *)
-(*Outgoing Oriented Graph Port*)
-
-
-(* ::Subsection:: *)
-(*Consistency checks*)
-
-
-OutgoingOrientedGraphPort::argx = "OrientedGraphPort called with `1` arguments; 1 argument are expected.";
-OutgoingOrientedGraphPort::int = "Argument `1` in OrientedGraphPort[`1`] is not an integer.";
-OutgoingOrientedGraphPort::pos = "Argument `1` in OrientedGraphPort[`1`] is not positive.";
-
-
-OutgoingOrientedGraphPort[args___] := 0 /; Length @ {args} != 1 &&
-	Message[OutgoingOrientedGraphPort::argx, Length @ {args}]
-
-OutgoingOrientedGraphPort[vertexIndex_ ? (NumericQ[#] && !IntegerQ[#] &)] := 0 /;
-	Message[OutgoingOrientedGraphPort::int, vertexIndex]
-
-OutgoingOrientedGraphPort[vertexIndex_ ? (NumericQ[#] && IntegerQ[#] && # <= 0 &)] := 0 /;
-	Message[OutgoingOrientedGraphPort::pos, vertexIndex]
-
-
-(* ::Subsection:: *)
-(*Standard Form*)
-
-
-OutgoingOrientedGraphPort /: MakeBoxes[OutgoingOrientedGraphPort[vertexIndex_Integer], StandardForm] /;
+OrientedGraphPort /: MakeBoxes[OrientedGraphPort[vertexIndex_Integer], StandardForm] /;
 	vertexIndex > 0 :=
 	With[{portLabel = ToBoxes @ Slot @ vertexIndex},
-		InterpretationBox[portLabel, OutgoingOrientedGraphPort[vertexIndex]]
+		InterpretationBox[portLabel, OrientedGraphPort[vertexIndex]]
 	]
 
 
@@ -133,9 +133,9 @@ OutgoingOrientedGraphPort /: MakeBoxes[OutgoingOrientedGraphPort[vertexIndex_Int
 (*$PortQ*)
 
 
-$PortQ[head_ ? (MatchQ[OrientedGraphPort | Subscript | List])[vertexIndex_Integer ? (# > 0 &), portIndex_ ? (MatchQ[1|2|3])]] := True
+$PortQ[head_ ? (MatchQ[OrientedVertexPort | Subscript | List])[vertexIndex_Integer ? (# > 0 &), portIndex_ ? (MatchQ[1|2|3])]] := True
 
-$PortQ[head_ ? (MatchQ[OutgoingOrientedGraphPort | Slot]) @ x_Integer ? (# > 0 &)] := True
+$PortQ[head_ ? (MatchQ[OrientedGraphPort | Slot]) @ x_Integer ? (# > 0 &)] := True
 
 $PortQ[arg___] := False
 
@@ -145,8 +145,8 @@ $PortQ[arg___] := False
 
 
 $ToCanonicalPort[port_] := port /. {
-	Subscript | List -> OrientedGraphPort,
-	Slot -> OutgoingOrientedGraphPort
+	Subscript | List -> OrientedVertexPort,
+	Slot -> OrientedGraphPort
 }
 
 
@@ -197,13 +197,13 @@ OrientedGraph[edges_List] /; (
 End[];
 
 
+Attributes[OrientedVertexPort] = {ReadProtected};
 Attributes[OrientedGraphPort] = {ReadProtected};
 Attributes[OrientedGraph] = {ReadProtected};
-Attributes[OutgoingOrientedGraphPort] = {ReadProtected};
 Attributes[OrientedGraphQ] = {ReadProtected};
 
 
-Protect[OrientedGraphPort, OrientedGraph, ReadProtected, OrientedGraphQ];
+Protect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ];
 
 
 EndPackage[]
