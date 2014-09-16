@@ -148,6 +148,13 @@ OrientedGraphPort /: MakeBoxes[OrientedGraphPort[vertexIndex_Integer], StandardF
 
 
 (* ::Subsection:: *)
+(*SyntaxInformation*)
+
+
+SyntaxInformation[OrientedGraph] = {"ArgumentsPattern" -> {{___}}};
+
+
+(* ::Subsection:: *)
 (*$PortQ*)
 
 
