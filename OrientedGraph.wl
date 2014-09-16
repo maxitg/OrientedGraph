@@ -267,8 +267,7 @@ OrientedGraphQ[arg_] := False
 
 
 $ToGraph[OrientedGraph[edges_]] := Graph[
-	Range @ $MaxVertexIndex @ edges,
-	Map[First, Select[AllTrue[$VertexPortQ] @ # &] @ edges, {2}]
+	Map[If[$VertexPortQ @ #, First @ #, #] &, edges, {2}]
 ]
 
 
