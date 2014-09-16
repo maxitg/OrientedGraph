@@ -326,6 +326,16 @@ $ModularIndex /: Part[obj_, $ModularIndex[i_Integer, m_Integer]] := Part[obj, Mo
 $ModularIndex /: Part[obj_, $ModularIndex[i_Integer]] := Part[obj, Mod[i - 1, Length @ obj] + 1]
 
 
+(* ::Section:: *)
+(*$NextPort*)
+
+
+$NextPort[p_ ? $VertexPortQ] := OrientedVertexPort[p[[1]], $ToInteger @ $ModularIndex[p[[2]] + 1, 3]]
+
+
+$NextPort[p_ ? $GraphPortQ] := p
+
+
 End[];
 
 
