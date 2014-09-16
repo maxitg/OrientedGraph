@@ -11,7 +11,7 @@
 BeginPackage["OrientedGraph`"];
 
 
-Unprotect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, OrientedToroidalGridGraph];
+Unprotect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround];
 
 
 OrientedVertexPort::usage = StringJoin @ {
@@ -41,15 +41,13 @@ OrientedGraphQ::usage =
 
 OrientedGridGraph::usage = StringJoin @ {
 	"OrientedGridGraph[",
-		"{\!\(\*StyleBox[\(m\), \"TI\"]\), \!(\*StyleBox[\(n\), \"TI\"]\)}",
+		"{\!\(\*StyleBox[\(m\), \"TI\"]\), \!\(\*StyleBox[\(n\), \"TI\"]\)}",
 	"] gives the oriented grid graph with \!\(\*RowBox[{StyleBox[\"m\", \"TI\"], \"\[Times]\", StyleBox[\"n\", \"TI\"]}]\) vertices."
 };
 
 
-OrientedToroidalGridGraph::usage = StringJoin @ {
-	"OrientedToroidalGridGraph[",
-		"{\!\(\*StyleBox[\(m\), \"TI\"]\), \!\(\*StyleBox[\(n\), \"TI\"]\)}",
-	"] gives the oriented hexagonal grid graph with \!\(\*RowBox[{StyleBox[\"m\", \"TI\"], \"\[Times]\", StyleBox[\"n\", \"TI\"]}]\) vertices wrapped around in a torus."
+WrappedAround::usage = StringJoin @ {
+	"WrappedAround is an option for OrientedGridGraph that specifies whether grid will be wrapped around in a torus or not."
 };
 
 
@@ -356,12 +354,23 @@ $VertexList[vertices_, graphPorts_][p_ ? $GraphPortQ] := graphPorts[[p[[1]]]]
 
 
 (* ::Subsection:: *)
+(*Plus*)
+
+
+$ModularIndex /: Plus[$ModularIndex[i_Integer, m_Integer], n_Integer] := $ModularIndex[i + n, m]
+
+$ModularIndex /: Plus[$ModularIndex[i_Integer], n_Integer] := $ModularIndex[i + n]
+
+
+(* ::Subsection:: *)
 (*$ToInteger*)
 
 
 $ModularIndex /: $ToInteger[$ModularIndex[i_Integer, m_Integer]] := Mod[i - 1, m] + 1
 
 $ModularIndex /: $ToInteger[$ModularIndex[i_Integer]] := i
+
+$ToInteger[n_Integer] := n
 
 
 (* ::Subsection:: *)
@@ -374,62 +383,89 @@ $ModularIndex /: Part[obj_, $ModularIndex[i_Integer]] := Part[obj, Mod[i - 1, Le
 
 
 (* ::Section:: *)
-(*OrientedToroidalGridGraph*)
+(*OrientedGridGraph*)
+
+
+(* ::Subsection:: *)
+(*Options*)
+
+
+Options[OrientedGridGraph] = {WrappedAround -> False}
 
 
 (* ::Subsection:: *)
 (*SyntaxInformation*)
 
 
-SyntaxInformation[OrientedToroidalGridGraph] = {"ArgumentsPattern" -> {{_, _}}}
+SyntaxInformation[OrientedGridGraph] = {"ArgumentsPattern" -> {{_, _}, OptionsPattern[]}}
 
 
 (* ::Subsection:: *)
 (*Consistency checks*)
 
 
-OrientedToroidalGridGraph::argx = "OrientedToroidalGridGraph called with `1` arguments; 1 argument is expected.";
-OrientedToroidalGridGraph::lpn = "Argument `1` in OrientedToroidalGridGraph[`1`] is not a list.";
-OrientedToroidalGridGraph::dim = "Only two dimensional grids are supported.";
-OrientedToroidalGridGraph::ilsmp = "List of positive even integers expected at position 1 of OrientedToroidalGridGraph[`1`].";
+OrientedGridGraph::argx = "OrientedGridGraph called with `1` arguments; 1 argument is expected.";
+OrientedGridGraph::nonopt = "Options expected (instead of `1`) beyond position 2 in `2`. An option must be a rule or a list of rules.";
+OrientedGridGraph::lpn = "Argument `1` in OrientedGridGraph[`1`] is not a list.";
+OrientedGridGraph::dim = "Only two dimensional grids are supported.";
+OrientedGridGraph::ilsmp = "List of positive even integers expected at position 1 of OrientedGridGraph[`1`].";
 
 
-OrientedToroidalGridGraph[args___] := 0 /; Length @ {args} != 1 &&
-	Message[OrientedToroidalGridGraph::argx, Length @ {args}]
+OrientedGridGraph[args___] := 0 /; Length @ {args} == 0 &&
+	Message[OrientedGridGraph::argx, Length @ {args}]
 
 
-OrientedToroidalGridGraph[arg_ ? (MatchQ[Except[_List]])] := 0 /;
-	Message[OrientedToroidalGridGraph::lpn, arg]
+OrientedGridGraph[arg_, opt__ ? (Not @* OptionQ)] := 0 /;
+	Message[OrientedGridGraph::nonopt, Last @ {opt}, "OrientedGridGraph"[arg, opt]]
 
 
-OrientedToroidalGridGraph[arg_List ? (Length @ # != 2 &)] := 0 /;
-	Message[OrientedToroidalGridGraph::dim]
+OrientedGridGraph[arg_ ? (MatchQ[Except[_List]]), opt___ ? OptionQ] := 0 /;
+	Message[OrientedGridGraph::lpn, arg]
 
 
-OrientedToroidalGridGraph[arg_List ? (Length @ # == 2 && AnyTrue[MatchQ[Except[_Integer | _Symbol]] @ # || # <= 0 || Mod[#, 2] != 0 &] @ # &)] := 0 /;
-	Message[OrientedToroidalGridGraph::ilsmp, arg]
+OrientedGridGraph[arg_List ? (Length @ # != 2 &), opt___ ? OptionQ] := 0 /;
+	Message[OrientedGridGraph::dim]
+
+
+OrientedGridGraph[arg_List ? (Length @ # == 2 && AnyTrue[MatchQ[Except[_Integer | _Symbol]] @ # || # <= 0 || Mod[#, 2] != 0 &] @ # &), opt___ ? OptionQ] := 0 /;
+	Message[OrientedGridGraph::ilsmp, arg]
+
+
+OrientedGridGraph[{m_Integer ? (# > 0 && Mod[#, 2] == 0 &), n_Integer ? (# > 0 && Mod[#, 2] == 0 &)}, opts : OptionsPattern[]] := 0 /;
+	FilterRules[{opts}, Options[OrientedGridGraph]] == {opts} && Not @ MatchQ[OptionValue[WrappedAround], True | False] &&
+	Message[General::opttf, WrappedAround, OptionValue[WrappedAround]]
 
 
 (* ::Subsection:: *)
-(*OrientedToroidalGridGraph*)
+(*OrientedGridGraph*)
 
 
-OrientedToroidalGridGraph[{m_Integer ? (# > 0 && Mod[#, 2] == 0 &), n_Integer ? (# > 0 && Mod[#, 2] == 0 &)}] :=
-	OrientedGraph @ Map[
+OrientedGridGraph[{m_Integer ? (# > 0 && Mod[#, 2] == 0 &), n_Integer ? (# > 0 && Mod[#, 2] == 0 &)}, opts : OptionsPattern[]] := Module[
+	{
+		graphPortIndex = 1
+	},
+	OrientedGraph @ Union @ Map[
 		Function[{i, j, type, port},
-			OrientedVertexPort[2 n (i - 1) + 4 (j - 1) + type, port]
-		] @@ # &,
+			If[1 <= i <= m / 2 && 1 <= j <= n / 2,
+				OrientedVertexPort[2 n (i - 1) + 4 (j - 1) + type, port],
+				OrientedGraphPort[graphPortIndex++]
+			]
+		] @@ $ToInteger /@ # &,
 		Flatten[{
-			{#[[1]], #[[2]], 1, 1} <-> {#[[1]], $ToInteger @ $ModularIndex[#[[2]] - 1, n / 2], 4, 1},
-			{#[[1]], #[[2]], 1, 2} <-> {$ToInteger @ $ModularIndex[#[[1]] + 1, m / 2], #[[2]], 2, 2},
+			{#[[1]], #[[2]] + 1, 1, 1} <-> {#[[1]], #[[2]], 4, 1},
+			{#[[1]], #[[2]], 1, 1} <-> {#[[1]], #[[2]] - 1, 4, 1},
+			{#[[1]] - 1, #[[2]], 1, 2} <-> {#[[1]], #[[2]], 2, 2},
+			{#[[1]], #[[2]], 1, 2} <-> {#[[1]] + 1, #[[2]], 2, 2},
 			{#[[1]], #[[2]], 1, 3} <-> {#[[1]], #[[2]], 2, 3},
 			{#[[1]], #[[2]], 3, 1} <-> {#[[1]], #[[2]], 2, 1},
 			{#[[1]], #[[2]], 3, 2} <-> {#[[1]], #[[2]], 4, 2},
-			{#[[1]], #[[2]], 3, 3} <-> {$ToInteger @ $ModularIndex[#[[1]] - 1, m / 2], #[[2]], 4, 3}
+			{#[[1]] + 1, #[[2]], 3, 3} <-> {#[[1]], #[[2]], 4, 3},
+			{#[[1]], #[[2]], 3, 3} <-> {#[[1]] - 1, #[[2]], 4, 3}
 		} & /@
-		Tuples[Range /@ {m / 2, n / 2}]],
+		Tuples[Map[If[OptionValue[WrappedAround], $ModularIndex @@ # &, #[[1]] &], Function[count, {#, count} & /@ Range[count]] /@ {m / 2, n / 2}, {2}]]],
 		{2}
-	]
+	] /; FilterRules[{opts}, Options[OrientedGridGraph]] == {opts} && MatchQ[OptionValue[WrappedAround], True | False]
+]
 
 
 (* ::Section:: *)
@@ -450,10 +486,10 @@ Attributes[OrientedGraphPort] = {ReadProtected};
 Attributes[OrientedGraph] = {ReadProtected};
 Attributes[OrientedGraphQ] = {ReadProtected};
 Attributes[OrientedGridGraph] = {ReadProtected};
-Attributes[OrientedToroidalGridGraph] = {ReadProtected};
+Attributes[WrappedAround] = {ReadProtected};
 
 
-Protect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, OrientedToroidalGridGraph];
+Protect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround];
 
 
 EndPackage[]
