@@ -107,6 +107,13 @@ OrientedVertexPort /: MakeBoxes[OrientedVertexPort[vertexIndex_Integer, portInde
 
 
 (* ::Subsection:: *)
+(*SyntaxInformation*)
+
+
+SyntaxInformation[OrientedGraphPort] = {"ArgumentsPattern" -> {_}}
+
+
+(* ::Subsection:: *)
 (*Consistency checks*)
 
 
