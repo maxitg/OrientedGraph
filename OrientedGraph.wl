@@ -133,11 +133,17 @@ OrientedGraphPort /: MakeBoxes[OrientedGraphPort[vertexIndex_Integer], StandardF
 (*$PortQ*)
 
 
-$PortQ[head_ ? (MatchQ[OrientedVertexPort | Subscript | List])[vertexIndex_Integer ? (# > 0 &), portIndex_ ? (MatchQ[1|2|3])]] := True
+$VertexPortQ[head_ ? (MatchQ[OrientedVertexPort | Subscript | List])[vertexIndex_Integer ? (# > 0 &), portIndex_ ? (MatchQ[1|2|3])]] := True
 
-$PortQ[head_ ? (MatchQ[OrientedGraphPort | Slot]) @ x_Integer ? (# > 0 &)] := True
+$VertexPortQ[args___] := False
 
-$PortQ[arg___] := False
+
+$GraphPortQ[head_ ? (MatchQ[OrientedGraphPort | Slot]) @ x_Integer ? (# > 0 &)] := True
+
+$GraphPortQ[args___] := False
+
+
+$PortQ[args___] := $VertexPortQ[args] || $GraphPortQ[args]
 
 
 (* ::Subsection:: *)
