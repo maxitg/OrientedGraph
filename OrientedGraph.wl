@@ -191,7 +191,7 @@ $MissingPorts[edges_List] :=
 
 
 (* ::Subsection:: *)
-(*$AllValidEdges*)
+(*$EdgesQ*)
 
 
 $EdgesQ[edges_] :=
@@ -199,6 +199,10 @@ $EdgesQ[edges_] :=
 		MatchQ[Head[#], UndirectedEdge | List] &&
 		AllTrue[$PortQ @ # &] @ # &
 	] @ edges
+
+
+$CompleteEdgesQ[edges_] :=
+	$EdgesQ @ edges && DuplicateFreeQ @ $PortList @ edges && $MissingPorts[edges] == {}
 
 
 (* ::Subsection:: *)
@@ -229,7 +233,27 @@ OrientedGraph[edges_List] := 0 /;
 
 
 OrientedGraph[edges_List] := OrientedGraph[$ToCanonicalEdge /@ edges] /;
-	$EdgesQ @ edges && DuplicateFreeQ @ $PortList @ edges && $MissingPorts[edges] == {} && edges =!= $ToCanonicalEdge /@ edges
+	$CompleteEdgesQ @ edges && edges =!= $ToCanonicalEdge /@ edges
+
+
+(* ::Section:: *)
+(*OrientedGraphQ*)
+
+
+OrientedGraphQ::argx = "OrientedGraphQ called with `1` arguments; 1 argument is expected.";
+
+
+OrientedGraphQ[args___] := 0 /; Length @ {args} != 1 &&
+	Message[OrientedGraphQ::argx, Length @ {args}]
+
+
+OrientedGraphQ[arg_ ? (Head[#] != OrientedGraph &)] := False
+
+
+OrientedGraphQ[OrientedGraph[edges_List ? $CompleteEdgesQ]] := True
+
+
+OrientedGraphQ[arg_] := False
 
 
 End[];
