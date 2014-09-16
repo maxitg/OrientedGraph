@@ -404,7 +404,7 @@ OrientedToroidalGridGraph[arg_List ? (Length @ # == 2 && AnyTrue[MatchQ[Except[_
 
 
 (* ::Subsection:: *)
-(*OrientedGridGraph*)
+(*OrientedToroidalGridGraph*)
 
 
 OrientedToroidalGridGraph[{m_Integer ? (# > 0 && Mod[#, 2] == 0 &), n_Integer ? (# > 0 && Mod[#, 2] == 0 &)}] :=
