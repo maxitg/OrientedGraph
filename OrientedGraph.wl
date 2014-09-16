@@ -167,7 +167,7 @@ $PortList[edges_List, head_] := Select[Head @ # == head &] @ $PortList[edges]
 (*$MaxVertexIndex and $MaxGraphPortIndex*)
 
 
-$MaxVertexOrGraphPort[edges_List, head_] := Max[First /@ $PortList[edges, head]]
+$MaxVertexOrGraphPort[edges_List, head_] := Max[First /@ $PortList[edges, head], 0]
 
 
 $MaxVertexIndex[edges_List] := $MaxVertexOrGraphPort[edges, OrientedVertexPort]
