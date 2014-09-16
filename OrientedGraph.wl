@@ -11,7 +11,7 @@
 BeginPackage["OrientedGraph`"];
 
 
-Unprotect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph];
+Unprotect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ, OrientedToroidalGridGraph];
 
 
 OrientedVertexPort::usage = StringJoin @ {
@@ -39,8 +39,11 @@ OrientedGraphQ::usage =
 	"OrientedGraphQ[\!\(\*StyleBox[\(g\), \"TI\"]\)] yields True if \!\(\*StyleBox[\(g\), \"TI\"]\) is a valid OrientedGraph object and False otherwise.";
 
 
-OrientedGridGraph::usage =
-	"OrientedGridGraph[{\!\(\*StyleBox[\(m\), \"TI\"]\), \!\(\*StyleBox[\(n\), \"TI\"]\)}] gives the oriented hexagonal grid graph with \!\(\*RowBox[{StyleBox[\"m\", \"TI\"], \"\[Times]\", StyleBox[\"n\", \"TI\"]}]\) vertices wrapped around in a torus.";
+OrientedToroidalGridGraph::usage = StringJoin @ {
+	"OrientedToroidalGridGraph[",
+		"{\!\(\*StyleBox[\(m\), \"TI\"]\), \!\(\*StyleBox[\(n\), \"TI\"]\)}",
+	"] gives the oriented hexagonal grid graph with \!\(\*RowBox[{StyleBox[\"m\", \"TI\"], \"\[Times]\", StyleBox[\"n\", \"TI\"]}]\) vertices wrapped around in a torus."
+};
 
 
 Begin["OrientedGraph`Private`"];
@@ -271,6 +274,9 @@ OrientedGraph[edges_List] := OrientedGraph[$ToCanonicalEdge /@ edges] /;
 (*OrientedGraphQ*)
 
 
+SyntaxInformation[OrientedGraphQ] = {"ArgumentsPattern" -> {_}}
+
+
 OrientedGraphQ::argx = "OrientedGraphQ called with `1` arguments; 1 argument is expected.";
 
 
@@ -361,40 +367,40 @@ $ModularIndex /: Part[obj_, $ModularIndex[i_Integer]] := Part[obj, Mod[i - 1, Le
 
 
 (* ::Section:: *)
-(*OrientedGridGraph*)
+(*OrientedToroidalGridGraph*)
 
 
 (* ::Subsection:: *)
 (*Consistency checks*)
 
 
-OrientedGridGraph::argx = "OrientedGridGraph called with `1` arguments; 1 argument is expected.";
-OrientedGridGraph::lpn = "Argument `1` in OrientedGridGraph[`1`] is not a list.";
-OrientedGridGraph::dim = "Only two dimensional grids are supported.";
-OrientedGridGraph::ilsmp = "List of positive even integers expected at position 1 of GridGraph[`1`].";
+OrientedToroidalGridGraph::argx = "OrientedToroidalGridGraph called with `1` arguments; 1 argument is expected.";
+OrientedToroidalGridGraph::lpn = "Argument `1` in OrientedToroidalGridGraph[`1`] is not a list.";
+OrientedToroidalGridGraph::dim = "Only two dimensional grids are supported.";
+OrientedToroidalGridGraph::ilsmp = "List of positive even integers expected at position 1 of OrientedToroidalGridGraph[`1`].";
 
 
-OrientedGridGraph[args___] := 0 /; Length @ {args} != 1 &&
-	Message[OrientedGridGraph::argx, Length @ {args}]
+OrientedToroidalGridGraph[args___] := 0 /; Length @ {args} != 1 &&
+	Message[OrientedToroidalGridGraph::argx, Length @ {args}]
 
 
-OrientedGridGraph[arg_ ? (MatchQ[Except[_List]])] := 0 /;
-	Message[OrientedGridGraph::lpn, arg]
+OrientedToroidalGridGraph[arg_ ? (MatchQ[Except[_List]])] := 0 /;
+	Message[OrientedToroidalGridGraph::lpn, arg]
 
 
-OrientedGridGraph[arg_List ? (Length @ # != 2 &)] := 0 /;
-	Message[OrientedGridGraph::dim]
+OrientedToroidalGridGraph[arg_List ? (Length @ # != 2 &)] := 0 /;
+	Message[OrientedToroidalGridGraph::dim]
 
 
-OrientedGridGraph[arg_List ? (Length @ # == 2 && AnyTrue[MatchQ[Except[_Integer | _Symbol]] @ # || # <= 0 || Mod[#, 2] != 0 &] @ # &)] := 0 /;
-	Message[OrientedGridGraph::ilsmp, arg]
+OrientedToroidalGridGraph[arg_List ? (Length @ # == 2 && AnyTrue[MatchQ[Except[_Integer | _Symbol]] @ # || # <= 0 || Mod[#, 2] != 0 &] @ # &)] := 0 /;
+	Message[OrientedToroidalGridGraph::ilsmp, arg]
 
 
 (* ::Subsection:: *)
 (*OrientedGridGraph*)
 
 
-OrientedGridGraph[{m_Integer ? (# > 0 && Mod[#, 2] == 0 &), n_Integer ? (# > 0 && Mod[#, 2] == 0 &)}] :=
+OrientedToroidalGridGraph[{m_Integer ? (# > 0 && Mod[#, 2] == 0 &), n_Integer ? (# > 0 && Mod[#, 2] == 0 &)}] :=
 	OrientedGraph @ Map[
 		Function[{i, j, type, port},
 			OrientedVertexPort[2 n (i - 1) + 4 (j - 1) + type, port]
@@ -429,10 +435,10 @@ Attributes[OrientedVertexPort] = {ReadProtected};
 Attributes[OrientedGraphPort] = {ReadProtected};
 Attributes[OrientedGraph] = {ReadProtected};
 Attributes[OrientedGraphQ] = {ReadProtected};
-Attributes[OrientedGridGraph] = {ReadProtected};
+Attributes[OrientedToroidalGridGraph] = {ReadProtected};
 
 
-Protect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph];
+Protect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ, OrientedToroidalGridGraph];
 
 
 EndPackage[]
