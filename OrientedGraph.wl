@@ -371,6 +371,13 @@ $ModularIndex /: Part[obj_, $ModularIndex[i_Integer]] := Part[obj, Mod[i - 1, Le
 
 
 (* ::Subsection:: *)
+(*SyntaxInformation*)
+
+
+SyntaxInformation[OrientedToroidalGridGraph] = {"ArgumentsPattern" -> {{_, _}}}
+
+
+(* ::Subsection:: *)
 (*Consistency checks*)
 
 
