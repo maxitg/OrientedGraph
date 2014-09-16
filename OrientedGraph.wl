@@ -267,7 +267,16 @@ $VertexList[g_ ? OrientedGraphQ] := Module[
 		directionsList
 	},
 	directionsList = (Sort @ Join[canonicalEdges, Reverse /@ canonicalEdges])[[All, 2]];
-	$VertexList @ {$Vertex @@@ Partition[#[[- 3 maxVertexIndex ;; ]], 3], #[[ ;; - 3 maxVertexIndex - 1]]} & @ directionsList
+	$VertexList[$Vertex @@@ Partition[#[[- 3 maxVertexIndex ;; ]], 3], #[[ ;; - 3 maxVertexIndex - 1]]] & @ directionsList
+]
+
+
+OrientedGraph[$VertexList[vertices_, graphPorts_]] := Module[
+	{
+		vertexAdjacentEdges = Flatten @ MapIndexed[Sort[#1 <-> OrientedVertexPort[#2[[1]], #2[[2]]]] &, List @@@ vertices, {2}],
+		graphAdjacentEdges = MapIndexed[Sort[#1 <-> OrientedGraphPort[#2[[1]]]] &, graphPorts]
+	},
+	Union @ Join[vertexAdjacentEdges, graphAdjacentEdges]
 ]
 
 
