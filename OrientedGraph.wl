@@ -54,7 +54,7 @@ Begin["OrientedGraph`Private`"];
 (*SyntaxInformation*)
 
 
-SyntaxInformation[OrientedVertexPort] = {"ArgumentsPattern" -> {_, _}}
+SyntaxInformation[OrientedVertexPort] = {"ArgumentsPattern" -> {_, _}};
 
 
 (* ::Subsection:: *)
@@ -110,7 +110,7 @@ OrientedVertexPort /: MakeBoxes[OrientedVertexPort[vertexIndex_Integer, portInde
 (*SyntaxInformation*)
 
 
-SyntaxInformation[OrientedGraphPort] = {"ArgumentsPattern" -> {_}}
+SyntaxInformation[OrientedGraphPort] = {"ArgumentsPattern" -> {_}};
 
 
 (* ::Subsection:: *)
