@@ -51,6 +51,13 @@ Begin["OrientedGraph`Private`"];
 
 
 (* ::Subsection:: *)
+(*SyntaxInformation*)
+
+
+SyntaxInformation[OrientedVertexPort] = {"ArgumentsPattern" -> {_, _}}
+
+
+(* ::Subsection:: *)
 (*Consistency checks*)
 
 
