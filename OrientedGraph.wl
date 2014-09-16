@@ -64,13 +64,13 @@ OrientedVertexPort[args___] := 0 /; Length @ {args} != 2 &&
 OrientedVertexPort[vertexIndex_ ? (NumericQ[#] && !IntegerQ[#] &), portIndex_] := 0 /;
 	Message[OrientedVertexPort::intvert, vertexIndex, portIndex]
 
-OrientedVertexPort[vertexIndex_ ? (NumericQ[#] && IntegerQ[#] && # <= 0 &), portIndex_] := 0 /;
+OrientedVertexPort[vertexIndex_ ? (IntegerQ[#] && # <= 0 &), portIndex_] := 0 /;
 	Message[OrientedVertexPort::posvert, vertexIndex, portIndex]
 
 OrientedVertexPort[vertexIndex_ ? (IntegerQ[#] && # > 0 &), portIndex_ ? (NumericQ[#] && !IntegerQ[#] &)] := 0 /;
 	Message[OrientedVertexPort::intport, vertexIndex, portIndex]
 
-OrientedVertexPort[vertexIndex_ ? (IntegerQ[#] && # > 0 &), portIndex_ ? (NumericQ[#] && IntegerQ[#] && # <= 0 &)] := 0 /;
+OrientedVertexPort[vertexIndex_ ? (IntegerQ[#] && # > 0 &), portIndex_ ? (IntegerQ[#] && # <= 0 &)] := 0 /;
 	Message[OrientedVertexPort::posport, vertexIndex, portIndex]
 
 OrientedVertexPort[vertexIndex_ ?(IntegerQ[#] && # > 0 &), portIndex_ ? (IntegerQ[#] && # > 3 &)] := 0 /;
@@ -110,7 +110,7 @@ OrientedGraphPort[args___] := 0 /; Length @ {args} != 1 &&
 OrientedGraphPort[vertexIndex_ ? (NumericQ[#] && !IntegerQ[#] &)] := 0 /;
 	Message[OrientedGraphPort::int, vertexIndex]
 
-OrientedGraphPort[vertexIndex_ ? (NumericQ[#] && IntegerQ[#] && # <= 0 &)] := 0 /;
+OrientedGraphPort[vertexIndex_ ? (IntegerQ[#] && # <= 0 &)] := 0 /;
 	Message[OrientedGraphPort::pos, vertexIndex]
 
 
