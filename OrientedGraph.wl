@@ -266,6 +266,10 @@ OrientedGraphQ[arg_] := False
 (*$VertexList*)
 
 
+(* ::Subsection:: *)
+(*OrientedGraph -> $VertexList*)
+
+
 $VertexList[g_ ? OrientedGraphQ] := Module[
 	{
 		canonicalEdges = $ToCanonicalEdge /@ g[[1]],
@@ -277,6 +281,10 @@ $VertexList[g_ ? OrientedGraphQ] := Module[
 ]
 
 
+(* ::Subsection:: *)
+(*$VertexList -> OrientedGraph*)
+
+
 OrientedGraph[$VertexList[vertices_, graphPorts_]] := Module[
 	{
 		vertexAdjacentEdges = Flatten @ MapIndexed[Sort[#1 <-> OrientedVertexPort[#2[[1]], #2[[2]]]] &, List @@@ vertices, {2}],
@@ -284,6 +292,16 @@ OrientedGraph[$VertexList[vertices_, graphPorts_]] := Module[
 	},
 	Union @ Join[vertexAdjacentEdges, graphAdjacentEdges]
 ]
+
+
+(* ::Subsection:: *)
+(*Edge referencing*)
+
+
+$VertexList[vertices_, graphPorts_][p_ ? $VertexPortQ] := vertices[[p[[1]], p[[2]]]]
+
+
+$VertexList[vertices_, graphPorts_][p_ ? $GraphPortQ] := graphPorts[[p[[1]]]]
 
 
 End[];
