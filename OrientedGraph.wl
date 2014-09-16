@@ -256,6 +256,21 @@ OrientedGraphQ[OrientedGraph[edges_List ? $CompleteEdgesQ]] := True
 OrientedGraphQ[arg_] := False
 
 
+(* ::Section:: *)
+(*$VertexList*)
+
+
+$VertexList[g_ ? OrientedGraphQ] := Module[
+	{
+		canonicalEdges = $ToCanonicalEdge /@ g[[1]],
+		maxVertexIndex = $MaxVertexIndex @ g[[1]],
+		directionsList
+	},
+	directionsList = (Sort @ Join[canonicalEdges, Reverse /@ canonicalEdges])[[All, 2]];
+	$VertexList @ {$Vertex @@@ Partition[#[[- 3 maxVertexIndex ;; ]], 3], #[[ ;; - 3 maxVertexIndex - 1]]} & @ directionsList
+]
+
+
 End[];
 
 
