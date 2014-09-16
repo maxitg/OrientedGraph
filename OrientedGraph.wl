@@ -11,7 +11,7 @@
 BeginPackage["OrientedGraph`"];
 
 
-Unprotect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ];
+Unprotect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph];
 
 
 OrientedVertexPort::usage = StringJoin @ {
@@ -37,6 +37,10 @@ OrientedGraph::usage = StringJoin @ {
 
 OrientedGraphQ::usage =
 	"OrientedGraphQ[\!\(\*StyleBox[\(g\), \"TI\"]\)] yields True if \!\(\*StyleBox[\(g\), \"TI\"]\) is a valid OrientedGraph object and False otherwise.";
+
+
+OrientedGridGraph::usage =
+	"OrientedGridGraph[{\!\(\*StyleBox[\(m\), \"TI\"]\), \!\(\*StyleBox[\(n\), \"TI\"]\)}] gives the oriented grid graph with \!\(\*RowBox[{StyleBox[\"m\", \"TI\"], \"\[Times]\", StyleBox[\"n\", \"TI\"]}]\) faces wrapped around in a torus."
 
 
 Begin["OrientedGraph`Private`"];
@@ -352,9 +356,10 @@ Attributes[OrientedVertexPort] = {ReadProtected};
 Attributes[OrientedGraphPort] = {ReadProtected};
 Attributes[OrientedGraph] = {ReadProtected};
 Attributes[OrientedGraphQ] = {ReadProtected};
+Attributes[OrientedGridGraph] = {ReadProtected};
 
 
-Protect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ];
+Protect[OrientedVertexPort, OrientedGraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph];
 
 
 EndPackage[]
