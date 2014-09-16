@@ -40,7 +40,7 @@ OrientedGraphQ::usage =
 
 
 OrientedGridGraph::usage =
-	"OrientedGridGraph[{\!\(\*StyleBox[\(m\), \"TI\"]\), \!\(\*StyleBox[\(n\), \"TI\"]\)}] gives the oriented hexagonal grid graph with \!\(\*RowBox[{StyleBox[\"m\", \"TI\"], \"\[Times]\", StyleBox[\"n\", \"TI\"]}]\) vertices wrapped around in a torus."
+	"OrientedGridGraph[{\!\(\*StyleBox[\(m\), \"TI\"]\), \!\(\*StyleBox[\(n\), \"TI\"]\)}] gives the oriented hexagonal grid graph with \!\(\*RowBox[{StyleBox[\"m\", \"TI\"], \"\[Times]\", StyleBox[\"n\", \"TI\"]}]\) vertices wrapped around in a torus.";
 
 
 Begin["OrientedGraph`Private`"];
@@ -347,10 +347,10 @@ $ModularIndex /: Part[obj_, $ModularIndex[i_Integer]] := Part[obj, Mod[i - 1, Le
 (*Consistency checks*)
 
 
-OrientedGridGraph::argx = "OrientedGridGraph called with `1` arguments; 1 argument is expected."
-OrientedGridGraph::lpn = "Argument `1` in OrientedGridGraph[`1`] is not a list."
-OrientedGridGraph::dim = "Only two dimensional grids are supported."
-OrientedGridGraph::ilsmp = "List of positive even integers expected at position 1 of GridGraph[`1`]."
+OrientedGridGraph::argx = "OrientedGridGraph called with `1` arguments; 1 argument is expected.";
+OrientedGridGraph::lpn = "Argument `1` in OrientedGridGraph[`1`] is not a list.";
+OrientedGridGraph::dim = "Only two dimensional grids are supported.";
+OrientedGridGraph::ilsmp = "List of positive even integers expected at position 1 of GridGraph[`1`].";
 
 
 OrientedGridGraph[args___] := 0 /; Length @ {args} != 1 &&
@@ -373,8 +373,22 @@ OrientedGridGraph[arg_List ? (Length @ # == 2 && AnyTrue[MatchQ[Except[_Integer 
 (*OrientedGridGraph*)
 
 
-OrientedGridGraph[{m_Integer ? (# > 0 &), n_Integer ? (# > 0 &)}] :=
-	"NotImplemented"
+OrientedGridGraph[{m_Integer ? (# > 0 && Mod[#, 2] == 0 &), n_Integer ? (# > 0 && Mod[#, 2] == 0 &)}] :=
+	OrientedGraph @ Map[
+		Function[{i, j, type, port},
+			OrientedVertexPort[2 n (i - 1) + 4 (j - 1) + type, port]
+		] @@ # &,
+		Flatten[{
+			{#[[1]], #[[2]], 1, 1} <-> {#[[1]], $ToInteger @ $ModularIndex[#[[2]] - 1, n / 2], 4, 1},
+			{#[[1]], #[[2]], 1, 2} <-> {$ToInteger @ $ModularIndex[#[[1]] + 1, m / 2], #[[2]], 2, 2},
+			{#[[1]], #[[2]], 1, 3} <-> {#[[1]], #[[2]], 2, 3},
+			{#[[1]], #[[2]], 3, 1} <-> {#[[1]], #[[2]], 2, 1},
+			{#[[1]], #[[2]], 3, 2} <-> {#[[1]], #[[2]], 4, 2},
+			{#[[1]], #[[2]], 3, 3} <-> {$ToInteger @ $ModularIndex[#[[1]] - 1, m / 2], #[[2]], 4, 3}
+		} & /@
+		Tuples[Range /@ {m / 2, n / 2}]],
+		{2}
+	]
 
 
 (* ::Section:: *)
