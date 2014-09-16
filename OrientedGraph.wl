@@ -304,6 +304,28 @@ $VertexList[vertices_, graphPorts_][p_ ? $VertexPortQ] := vertices[[p[[1]], p[[2
 $VertexList[vertices_, graphPorts_][p_ ? $GraphPortQ] := graphPorts[[p[[1]]]]
 
 
+(* ::Section:: *)
+(*$ModularIndex*)
+
+
+(* ::Subsection:: *)
+(*$ToInteger*)
+
+
+$ModularIndex /: $ToInteger[$ModularIndex[i_Integer, m_Integer]] := Mod[i - 1, m] + 1
+
+$ModularIndex /: $ToInteger[$ModularIndex[i_Integer]] := i
+
+
+(* ::Subsection:: *)
+(*Part*)
+
+
+$ModularIndex /: Part[obj_, $ModularIndex[i_Integer, m_Integer]] := Part[obj, Mod[i - 1, m] + 1]
+
+$ModularIndex /: Part[obj_, $ModularIndex[i_Integer]] := Part[obj, Mod[i - 1, Length @ obj] + 1]
+
+
 End[];
 
 
