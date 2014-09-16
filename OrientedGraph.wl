@@ -263,6 +263,16 @@ OrientedGraphQ[arg_] := False
 
 
 (* ::Section:: *)
+(*$ToGraph*)
+
+
+$ToGraph[OrientedGraph[edges_]] := Graph[
+	Range @ $MaxVertexIndex @ edges,
+	Map[First, Select[AllTrue[$VertexPortQ] @ # &] @ edges, {2}]
+]
+
+
+(* ::Section:: *)
 (*$VertexList*)
 
 
