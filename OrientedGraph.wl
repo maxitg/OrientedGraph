@@ -40,7 +40,7 @@ OrientedGraphQ::usage =
 
 
 OrientedGridGraph::usage =
-	"OrientedGridGraph[{\!\(\*StyleBox[\(m\), \"TI\"]\), \!\(\*StyleBox[\(n\), \"TI\"]\)}] gives the oriented grid graph with \!\(\*RowBox[{StyleBox[\"m\", \"TI\"], \"\[Times]\", StyleBox[\"n\", \"TI\"]}]\) faces wrapped around in a torus."
+	"OrientedGridGraph[{\!\(\*StyleBox[\(m\), \"TI\"]\), \!\(\*StyleBox[\(n\), \"TI\"]\)}] gives the oriented hexagonal grid graph with \!\(\*RowBox[{StyleBox[\"m\", \"TI\"], \"\[Times]\", StyleBox[\"n\", \"TI\"]}]\) faces wrapped around in a torus."
 
 
 Begin["OrientedGraph`Private`"];
@@ -337,6 +337,44 @@ $ModularIndex /: $ToInteger[$ModularIndex[i_Integer]] := i
 $ModularIndex /: Part[obj_, $ModularIndex[i_Integer, m_Integer]] := Part[obj, Mod[i - 1, m] + 1]
 
 $ModularIndex /: Part[obj_, $ModularIndex[i_Integer]] := Part[obj, Mod[i - 1, Length @ obj] + 1]
+
+
+(* ::Section:: *)
+(*OrientedGridGraph*)
+
+
+(* ::Subsection:: *)
+(*Consistency checks*)
+
+
+OrientedGridGraph::argx = "OrientedGridGraph called with `1` arguments; 1 argument is expected."
+OrientedGridGraph::lpn = "Argument `1` in OrientedGridGraph[`1`] is not a list."
+OrientedGridGraph::ilsmp = "List of positive integers expected at position 1 of GridGraph[`1`]."
+OrientedGridGraph::dim = "Only two dimensional grids are supported."
+
+
+OrientedGridGraph[args___] := 0 /; Length @ {args} != 1 &&
+	Message[OrientedGridGraph::argx, Length @ {args}]
+
+
+OrientedGridGraph[arg_ ? (MatchQ[Except[_List]])] := 0 /;
+	Message[OrientedGridGraph::lpn, arg]
+
+
+OrientedGridGraph[arg_List ? (AnyTrue[MatchQ[Except[_Integer | _Symbol]] @ # || # <= 0 &])] := 0 /;
+	Message[OrientedGridGraph::ilsmp, arg]
+
+
+OrientedGridGraph[arg_List ? (AllTrue[MatchQ[_Integer] @ # && # > 0 &] @ # && Length @ # != 2 &)] := 0 /;
+	Message[OrientedGridGraph::dim]
+
+
+(* ::Subsection:: *)
+(*OrientedGridGraph*)
+
+
+OrientedGridGraph[{m_Integer ? (# > 0 &), n_Integer ? (# > 0 &)}] :=
+	"NotImplemented"
 
 
 (* ::Section:: *)
