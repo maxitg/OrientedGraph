@@ -406,9 +406,10 @@ SyntaxInformation[OrientedGridGraph] = {"ArgumentsPattern" -> {{_, _}, OptionsPa
 
 OrientedGridGraph::argx = "OrientedGridGraph called with `1` arguments; 1 argument is expected.";
 OrientedGridGraph::nonopt = "Options expected (instead of `1`) beyond position 2 in `2`. An option must be a rule or a list of rules.";
-OrientedGridGraph::lpn = "Argument `1` in OrientedGridGraph[`1`] is not a list.";
+OrientedGridGraph::lpn = "Argument `1` in `2` is not a list.";
 OrientedGridGraph::dim = "Only two dimensional grids are supported.";
-OrientedGridGraph::ilsmp = "List of positive even integers expected at position 1 of OrientedGridGraph[`1`].";
+OrientedGridGraph::ilsmp = "List of positive integers expected at position 1 of `1`.";
+OrientedGridGraph::neven = "Wrapped around grid should have even number of vertices in each direction instead of `1`.";
 
 
 OrientedGridGraph[args___] := 0 /; Length @ {args} == 0 &&
@@ -420,52 +421,115 @@ OrientedGridGraph[arg_, opt__ ? (Not @* OptionQ)] := 0 /;
 
 
 OrientedGridGraph[arg_ ? (MatchQ[Except[_List]]), opt___ ? OptionQ] := 0 /;
-	Message[OrientedGridGraph::lpn, arg]
+	Message[OrientedGridGraph::lpn, arg, "OrientedGridGraph"[arg, opt]]
 
 
 OrientedGridGraph[arg_List ? (Length @ # != 2 &), opt___ ? OptionQ] := 0 /;
 	Message[OrientedGridGraph::dim]
 
 
-OrientedGridGraph[arg_List ? (Length @ # == 2 && AnyTrue[MatchQ[Except[_Integer | _Symbol]] @ # || # <= 0 || Mod[#, 2] != 0 &] @ # &), opt___ ? OptionQ] := 0 /;
-	Message[OrientedGridGraph::ilsmp, arg]
+OrientedGridGraph[arg_List ? (Length @ # == 2 && AnyTrue[MatchQ[Except[_Integer | _Symbol]] @ # || # <= 0 &] @ # &), opt___ ? OptionQ] := 0 /;
+	Message[OrientedGridGraph::ilsmp, "OrientedGridGraph"[arg, opt]]
 
 
-OrientedGridGraph[{m_Integer ? (# > 0 && Mod[#, 2] == 0 &), n_Integer ? (# > 0 && Mod[#, 2] == 0 &)}, opts : OptionsPattern[]] := 0 /;
+OrientedGridGraph[{m_Integer ? (# > 0 &), n_Integer ? (# > 0 &)}, opts : OptionsPattern[]] := 0 /;
 	FilterRules[{opts}, Options[OrientedGridGraph]] == {opts} && Not @ MatchQ[OptionValue[WrappedAround], True | False] &&
 	Message[General::opttf, WrappedAround, OptionValue[WrappedAround]]
+
+
+OrientedGridGraph[arg_List ? (Length @ # == 2 && AllTrue[MatchQ[_Integer] @ # && # > 0 &] @ # &), opts : OptionsPattern[]] := 0 /;
+	FilterRules[{opts}, Options[OrientedGridGraph]] == {opts} && OptionValue[WrappedAround] === True && AnyTrue[Mod[#, 2] != 0 &] @ arg &&
+	Message[OrientedGridGraph::neven, arg]
 
 
 (* ::Subsection:: *)
 (*OrientedGridGraph*)
 
 
-OrientedGridGraph[{m_Integer ? (# > 0 && Mod[#, 2] == 0 &), n_Integer ? (# > 0 && Mod[#, 2] == 0 &)}, opts : OptionsPattern[]] := Module[
+$GridRegion[{{m1_Integer, m2_Integer}, {n1_Integer, n2_Integer}}] :=
+	Flatten[{
+		{#[[1]], #[[2]], 3, 1} <-> {#[[1]], #[[2]] - 1, 4, 1},
+		{#[[1]], #[[2]], 3, 2} <-> {#[[1]] + 1, #[[2]], 1, 2},
+		{#[[1]], #[[2]], 3, 3} <-> {#[[1]], #[[2]], 1, 3},
+		{#[[1]], #[[2]], 2, 1} <-> {#[[1]], #[[2]], 1, 1},
+		{#[[1]], #[[2]], 2, 2} <-> {#[[1]], #[[2]], 4, 2},
+		{#[[1]], #[[2]], 2, 3} <-> {#[[1]] - 1, #[[2]], 4, 3}
+	} & /@
+	Tuples[Range @@ # & /@ {{m1, m2}, {n1, n2}}]]
+
+
+$OrientedToroidalGridEdges[{m_Integer, n_Integer}] :=
+	Map[
+		OrientedVertexPort[2 n (#[[1]] - 1) + 4 (#[[2]] - 1) + #[[3]], #[[4]]] & @*
+		({$ToInteger @ $ModularIndex[#[[1]], m / 2], $ToInteger @ $ModularIndex[#[[2]], n / 2], #[[3]], #[[4]]} &),
+		$GridRegion[{{1, m / 2}, {1, n / 2}}],
+		{2}
+	]
+
+
+$OrientedGridEdges[{m_Integer, n_Integer}] := Module[
 	{
 		graphPortIndex = 1
 	},
-	OrientedGraph @ Union @ Map[
-		Function[{i, j, type, port},
-			If[1 <= i <= m / 2 && 1 <= j <= n / 2,
-				OrientedVertexPort[2 n (i - 1) + 4 (j - 1) + type, port],
-				OrientedGraphPort[graphPortIndex++]
+	# /. {0 :> OrientedGraphPort[graphPortIndex++]} & @
+	DeleteCases[0 <-> 0] @
+	Map[
+		If[
+			#[[1]] < 1 || #[[1]] > Ceiling[m / 2] || #[[1]] > m / 2 && MatchQ[#[[3]], 3 | 4] ||
+			#[[2]] < 1 || #[[2]] > Ceiling[n / 2] || #[[2]] > n / 2 && MatchQ[#[[3]], 2 | 4],
+			0,
+			OrientedVertexPort[
+				2 n (#[[1]] - 1) +
+				n If[MatchQ[#[[3]], 1 | 2], 0, 1] +
+				2 (#[[2]] - 1) +
+				If[MatchQ[#[[3]], 1 | 3], 0, 1] +
+				1,
+				#[[4]]
 			]
-		] @@ $ToInteger /@ # &,
-		Flatten[{
-			{#[[1]], #[[2]] + 1, 1, 1} <-> {#[[1]], #[[2]], 4, 1},
-			{#[[1]], #[[2]], 1, 1} <-> {#[[1]], #[[2]] - 1, 4, 1},
-			{#[[1]] - 1, #[[2]], 1, 2} <-> {#[[1]], #[[2]], 2, 2},
-			{#[[1]], #[[2]], 1, 2} <-> {#[[1]] + 1, #[[2]], 2, 2},
-			{#[[1]], #[[2]], 1, 3} <-> {#[[1]], #[[2]], 2, 3},
-			{#[[1]], #[[2]], 3, 1} <-> {#[[1]], #[[2]], 2, 1},
-			{#[[1]], #[[2]], 3, 2} <-> {#[[1]], #[[2]], 4, 2},
-			{#[[1]] + 1, #[[2]], 3, 3} <-> {#[[1]], #[[2]], 4, 3},
-			{#[[1]], #[[2]], 3, 3} <-> {#[[1]] - 1, #[[2]], 4, 3}
-		} & /@
-		Tuples[Map[If[OptionValue[WrappedAround], $ModularIndex @@ # &, #[[1]] &], Function[count, {#, count} & /@ Range[count]] /@ {m / 2, n / 2}, {2}]]],
+		] &,
+		$GridRegion[{{0, Ceiling[m / 2] + 1}, {0, Ceiling[n / 2] + 1}}],
 		{2}
-	] /; FilterRules[{opts}, Options[OrientedGridGraph]] == {opts} && MatchQ[OptionValue[WrappedAround], True | False]
+	]
 ]
+
+
+OrientedGridGraph[{m_Integer ? (# > 0 &), n_Integer ? (# > 0 &)}, opts : OptionsPattern[]] :=
+	OrientedGraph @
+	If[OptionValue[WrappedAround],
+		$OrientedToroidalGridEdges[{m, n}],
+		$OrientedGridEdges[{m, n}]
+	] /;
+	MatchQ[OptionValue[WrappedAround], True | False] && FilterRules[{opts}, Options[OrientedGridGraph]] == {opts} && If[OptionValue[WrappedAround], Mod[n, 2] == 0 && Mod[m, 2] == 0, True]
+
+
+OrientedGridGraph[{m_Integer ? (# > 0 && Mod[#, 2] == 0 &), n_Integer ? (# > 0 && Mod[#, 2] == 0 &)}, opts : OptionsPattern[]] := Module[
+  	{
+   		graphPortIndex = 1
+   	},
+  	OrientedGraph @ Union @ Map[
+      		Function[{i, j, type, port},
+         			If[1 <= i <= m / 2 && 1 <= j <= n / 2,
+          				OrientedVertexPort[2 n (i - 1) + 4 (j - 1) + type, port],
+          				OrientedGraphPort[graphPortIndex++]
+          			]
+         		] @@ $ToInteger /@ # &,
+      		Flatten[{
+          			{#[[1]], #[[2]], 1, 1} <-> {#[[1]], #[[2]] - 1, 4, 1},
+          			{#[[1]], #[[2]], 1, 2} <-> {#[[1]] + 1, #[[2]], 2, 2},
+          			{#[[1]], #[[2]], 1, 3} <-> {#[[1]], #[[2]], 2, 3},
+          			{#[[1]], #[[2]], 3, 1} <-> {#[[1]], #[[2]], 2, 1},
+          			{#[[1]], #[[2]], 3, 2} <-> {#[[1]], #[[2]], 4, 2},
+          			{#[[1]], #[[2]], 3, 3} <-> {#[[1]] - 1, #[[2]], 4, 3},
+          			
+          			(* copies included for near border cases *)
+          			{#[[1]], #[[2]] + 1, 1, 1} <-> {#[[1]], #[[2]], 4, 1},
+          			{#[[1]] - 1, #[[2]], 1, 2} <-> {#[[1]], #[[2]], 2, 2},
+          			{#[[1]] + 1, #[[2]], 3, 3} <-> {#[[1]], #[[2]], 4, 3}
+          		} & /@
+        		Tuples[Map[If[OptionValue[WrappedAround], $ModularIndex @@ # &, #[[1]] &], Function[count, {#, count} & /@ Range[count]] /@ {m / 2, n / 2}, {2}]]],
+      		{2}
+      	] /; MatchQ[OptionValue[WrappedAround], True | False] && FilterRules[{opts}, Options[OrientedGridGraph]] == {opts}
+  ]
 
 
 (* ::Section:: *)
