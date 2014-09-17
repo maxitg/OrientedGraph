@@ -105,7 +105,7 @@ $PortColor[OrientedVertexPort[vertexIndex_, slotIndex_]] := ColorData[97, slotIn
 
 OrientedVertexPort /: MakeBoxes[OrientedVertexPort[vertexIndex_Integer, portIndex_ ? (MatchQ[1|2|3])], StandardForm] /;
 	vertexIndex > 0 :=
-	With[{portLabel = ToBoxes @ Style[vertexIndex, $PortColor @ OrientedVertexPort[vertexIndex, portIndex]]},
+	With[{portLabel = ToBoxes @ Style[Subscript[vertexIndex, portIndex], $PortColor @ OrientedVertexPort[vertexIndex, portIndex]]},
 		InterpretationBox[portLabel, OrientedVertexPort[vertexIndex, portIndex]]
 	]
 
