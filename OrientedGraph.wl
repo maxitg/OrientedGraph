@@ -542,6 +542,13 @@ $NextPort[p_ ? $VertexPortQ] := OrientedVertexPort[p[[1]], $ToInteger @ $Modular
 $NextPort[p_ ? $GraphPortQ] := p
 
 
+(* ::Section:: *)
+(*$FaceWalk*)
+
+
+$FaceWalk[g_$VertexList, p_ ? $PortQ] := $NextPort @ g @ p
+
+
 End[];
 
 
