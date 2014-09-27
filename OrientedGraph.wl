@@ -11,7 +11,7 @@
 BeginPackage["OrientedGraph`"];
 
 
-Unprotect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround];
+Unprotect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround, AdjacencyList];
 
 
 VertexPort::usage = StringJoin @ {
@@ -335,7 +335,7 @@ OrientedGraph[$VertexList[vertices_, graphPorts_]] := Module[
 		vertexAdjacentEdges = Flatten @ MapIndexed[Sort[#1 <-> VertexPort[#2[[1]], #2[[2]]]] &, List @@@ vertices, {2}],
 		graphAdjacentEdges = MapIndexed[Sort[#1 <-> GraphPort[#2[[1]]]] &, graphPorts]
 	},
-	Union @ Join[vertexAdjacentEdges, graphAdjacentEdges]
+	OrientedGraph @ Union @ Join[vertexAdjacentEdges, graphAdjacentEdges]
 ]
 
 
@@ -520,6 +520,16 @@ $NextPort[p_ ? $GraphPortQ] := p
 $FaceWalk[g_$VertexList, p_ ? $PortQ] := $NextPort @ g @ p
 
 
+(* ::Section:: *)
+(*AdjacencyList*)
+
+
+AdjacencyList[graph_ ? OrientedGraphQ] := {}
+
+
+AdjacencyList[graph_ ? OrientedGraphQ, v_, arg___] := AdjacencyList[$ToGraph @ graph, $ToCanonicalPort @ v, arg]
+
+
 End[];
 
 
@@ -531,7 +541,7 @@ Attributes[OrientedGridGraph] = {ReadProtected};
 Attributes[WrappedAround] = {ReadProtected};
 
 
-Protect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround];
+Protect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround, AdjacencyList];
 
 
 EndPackage[]
