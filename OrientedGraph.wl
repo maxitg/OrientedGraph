@@ -499,37 +499,8 @@ OrientedGridGraph[{m_Integer ? (# > 0 &), n_Integer ? (# > 0 &)}, opts : Options
 		$OrientedToroidalGridEdges[{m, n}],
 		$OrientedGridEdges[{m, n}]
 	] /;
-	MatchQ[OptionValue[WrappedAround], True | False] && FilterRules[{opts}, Options[OrientedGridGraph]] == {opts} && If[OptionValue[WrappedAround], Mod[n, 2] == 0 && Mod[m, 2] == 0, True]
-
-
-OrientedGridGraph[{m_Integer ? (# > 0 && Mod[#, 2] == 0 &), n_Integer ? (# > 0 && Mod[#, 2] == 0 &)}, opts : OptionsPattern[]] := Module[
-  	{
-   		graphPortIndex = 1
-   	},
-  	OrientedGraph @ Union @ Map[
-      		Function[{i, j, type, port},
-         			If[1 <= i <= m / 2 && 1 <= j <= n / 2,
-          				VertexPort[2 n (i - 1) + 4 (j - 1) + type, port],
-          				GraphPort[graphPortIndex++]
-          			]
-         		] @@ $ToInteger /@ # &,
-      		Flatten[{
-          			{#[[1]], #[[2]], 1, 1} <-> {#[[1]], #[[2]] - 1, 4, 1},
-          			{#[[1]], #[[2]], 1, 2} <-> {#[[1]] + 1, #[[2]], 2, 2},
-          			{#[[1]], #[[2]], 1, 3} <-> {#[[1]], #[[2]], 2, 3},
-          			{#[[1]], #[[2]], 3, 1} <-> {#[[1]], #[[2]], 2, 1},
-          			{#[[1]], #[[2]], 3, 2} <-> {#[[1]], #[[2]], 4, 2},
-          			{#[[1]], #[[2]], 3, 3} <-> {#[[1]] - 1, #[[2]], 4, 3},
-          			
-          			(* copies included for near border cases *)
-          			{#[[1]], #[[2]] + 1, 1, 1} <-> {#[[1]], #[[2]], 4, 1},
-          			{#[[1]] - 1, #[[2]], 1, 2} <-> {#[[1]], #[[2]], 2, 2},
-          			{#[[1]] + 1, #[[2]], 3, 3} <-> {#[[1]], #[[2]], 4, 3}
-          		} & /@
-        		Tuples[Map[If[OptionValue[WrappedAround], $ModularIndex @@ # &, #[[1]] &], Function[count, {#, count} & /@ Range[count]] /@ {m / 2, n / 2}, {2}]]],
-      		{2}
-      	] /; MatchQ[OptionValue[WrappedAround], True | False] && FilterRules[{opts}, Options[OrientedGridGraph]] == {opts}
-  ]
+	MatchQ[OptionValue[WrappedAround], True | False] &&
+	FilterRules[{opts}, Options[OrientedGridGraph]] == {opts} && If[OptionValue[WrappedAround], Mod[n, 2] == 0 && Mod[m, 2] == 0, True]
 
 
 (* ::Section:: *)
