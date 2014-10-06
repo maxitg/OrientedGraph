@@ -293,7 +293,7 @@ OrientedGraph[edges_List] := OrientedGraph[$ToCanonicalEdge /@ edges] /;
 (*OrientedGraphQ*)
 
 
-SyntaxInformation[OrientedGraphQ] = {"ArgumentsPattern" -> {_}}
+SyntaxInformation[OrientedGraphQ] = {"ArgumentsPattern" -> {_}};
 
 
 OrientedGraphQ::argx = "OrientedGraphQ called with `1` arguments; 1 argument is expected.";
@@ -553,6 +553,35 @@ AdjacencyList[graph_ ? OrientedGraphQ, v_, arg___] := AdjacencyList[$ToGraph @ g
 
 
 SyntaxInformation[OrientedGraphIsomorphism] = {"ArgumentsPattern" -> {_, _, _, _}};
+
+
+(* ::Subsection:: *)
+(*Consistancy checks*)
+
+
+OrientedGraphIsomorphism::argx = "OrientedGraphIsomorphism called with `1` arguments; 4 arguments is expected.";
+OrientedGraphIsomorphism::nonog = "Argument `1` in OrientedGraphIsomophism[`2`, `3`, `4`, `5`] is not an OrientedGraph";
+OrientedGraphIsomorphism::nop = "Argument `1` in OrientedGraphIsomorphism[`2`, `3`, `4`, `5`] is not a port";
+
+
+OrientedGraphIsomorphism[args___] := 0 /; Length @ {args} != 4 &&
+	Message[OrientedGraphIsomorphism::argx, Length @ {args}]
+
+
+OrientedGraphIsomorphism[g1_ ? (!OrientedGraphQ[#] && !(Head[#] === Symbol) &), g2_, p1_, p2_] := 0 /;
+	Message[OrientedGraphIsomorphism::nonog, g1, g1, g2, p1, p2]
+
+
+OrientedGraphIsomorphism[g1_ ? OrientedGraphQ, g2_ ? (!OrientedGraphQ[#] && !(Head[#] === Symbol) &), p1_, p2_] := 0 /;
+	Message[OrientedGraphIsomorphism::nonog, g2, g1, g2, p1, p2]
+
+
+OrientedGraphIsomorphism[g1_ ? OrientedGraphQ, g2_ ? OrientedGraphQ, p1_ ? (!$PortQ[#] && !(Head[#] === Symbol) &), p2_] := 0 /;
+	Message[OrientedGraphIsomorphism::nop, p1, g1, g2, p1, p2]
+
+
+OrientedGraphIsomorphism[g1_ ? OrientedGraphQ, g2_ ? OrientedGraphQ, p1_ ? $PortQ, p2_ ? (!$PortQ[#] && !(Head[#] === Symbol) &)] := 0 /;
+	Message[OrientedGraphIsomorphism::nop, p2, g1, g2, p1, p2]
 
 
 End[];
