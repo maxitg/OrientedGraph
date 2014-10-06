@@ -55,7 +55,7 @@ OrientedGraphIsomorphism::usage = StringJoin @ {
 	"FindOrietnedGraphIsomorphism[",
 		"\!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(1\), \"TR\"]]\), ",
 		"\!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(2\), \"TR\"]]\), ",
-		"\!\(\*SubscriptBox[StyleBox[\(p\), \"TI\"], StyleBox[\(1\), \"TR\"]]\) \[Rule] ",
+		"\!\(\*SubscriptBox[StyleBox[\(p\), \"TI\"], StyleBox[\(1\), \"TR\"]]\), ",
 		"\!\(\*SubscriptBox[StyleBox[\(p\), \"TI\"], StyleBox[\(2\), \"TR\"]]\)",
 	"] gives an isomorphism that maps the oriented graph \!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(1\), \"TR\"]]\) to ",
 	"\!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(2\), \"TR\"]]\) by reordering vertices and ports, such that ",
@@ -542,6 +542,17 @@ AdjacencyList[graph_ ? OrientedGraphQ] := {}
 
 
 AdjacencyList[graph_ ? OrientedGraphQ, v_, arg___] := AdjacencyList[$ToGraph @ graph, $ToCanonicalPort @ v, arg]
+
+
+(* ::Section:: *)
+(*OrientedGraphIsomorphism*)
+
+
+(* ::Subsection:: *)
+(*SyntaxInformation*)
+
+
+SyntaxInformation[OrientedGraphIsomorphism] = {"ArgumentsPattern" -> {_, _, _, _}};
 
 
 End[];
