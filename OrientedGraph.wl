@@ -11,7 +11,7 @@
 BeginPackage["OrientedGraph`"];
 
 
-Unprotect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround, AdjacencyList];
+Unprotect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround, AdjacencyList, OrientedGraphIsomorphism];
 
 
 VertexPort::usage = StringJoin @ {
@@ -48,6 +48,20 @@ OrientedGridGraph::usage = StringJoin @ {
 
 WrappedAround::usage = StringJoin @ {
 	"WrappedAround is an option for OrientedGridGraph that specifies whether grid will be wrapped around in a torus or not."
+};
+
+
+OrientedGraphIsomorphism::usage = StringJoin @ {
+	"FindOrietnedGraphIsomorphism[",
+		"\!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(1\), \"TR\"]]\), ",
+		"\!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(2\), \"TR\"]]\), ",
+		"\!\(\*SubscriptBox[StyleBox[\(p\), \"TI\"], StyleBox[\(1\), \"TR\"]]\) \[Rule] ",
+		"\!\(\*SubscriptBox[StyleBox[\(p\), \"TI\"], StyleBox[\(2\), \"TR\"]]\)",
+	"] gives an isomorphism that maps the oriented graph \!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(1\), \"TR\"]]\) to ",
+	"\!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(2\), \"TR\"]]\) by reordering vertices and ports, such that ",
+	"the port \!\(\*SubscriptBox[StyleBox[\(p\), \"TI\"], StyleBox[\(1\), \"TR\"]]\) of \!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(1\), \"TR\"]]\) ",
+	"corresponds to ",
+	"\!\(\*SubscriptBox[StyleBox[\(p\), \"TI\"], StyleBox[\(2\), \"TR\"]]\) of \!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(2\), \"TR\"]]\)."
 };
 
 
@@ -539,9 +553,10 @@ Attributes[OrientedGraph] = {ReadProtected};
 Attributes[OrientedGraphQ] = {ReadProtected};
 Attributes[OrientedGridGraph] = {ReadProtected};
 Attributes[WrappedAround] = {ReadProtected};
+Attributes[OrientedGraphIsomorphism] = {ReadProtected};
 
 
-Protect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround, AdjacencyList];
+Protect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround, AdjacencyList, OrientedGraphIsomorphism];
 
 
 EndPackage[]
