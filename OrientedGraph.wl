@@ -528,6 +528,16 @@ $NextPort[p_ ? $GraphPortQ] := p
 
 
 (* ::Section:: *)
+(*$PreviousPort*)
+
+
+$PreviousPort[p_ ? $VertexPortQ] := VertexPort[p[[1]], $ToInteger @ $ModularIndex[p[[2]] - 1, 3]]
+
+
+$PreviousPort[p_ ? $GraphPortQ] := p
+
+
+(* ::Section:: *)
 (*$FaceWalk*)
 
 
