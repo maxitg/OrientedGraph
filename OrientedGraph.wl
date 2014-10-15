@@ -11,7 +11,7 @@
 BeginPackage["OrientedGraph`"];
 
 
-Unprotect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround, AdjacencyList, OrientedGraphIsomorphism];
+Unprotect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround, AdjacencyList, LocalDimensionality, OrientedGraphIsomorphism];
 
 
 VertexPort::usage = StringJoin @ {
@@ -62,6 +62,17 @@ OrientedGraphIsomorphism::usage = StringJoin @ {
 	"the port \!\(\*SubscriptBox[StyleBox[\(p\), \"TI\"], StyleBox[\(1\), \"TR\"]]\) of \!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(1\), \"TR\"]]\) ",
 	"corresponds to ",
 	"\!\(\*SubscriptBox[StyleBox[\(p\), \"TI\"], StyleBox[\(2\), \"TR\"]]\) of \!\(\*SubscriptBox[StyleBox[\(g\), \"TI\"], StyleBox[\(2\), \"TR\"]]\)."
+};
+
+
+LocalDimensionality::usage = StringJoin @ {
+	"LocalDimensionality[",
+		"\!\(\*StyleBox[\(g\), \"TI\"]\), \!\(\*StyleBox[\(v\), \"TI\"]\)",
+	"] gives dimensionality near the vertex \!\(\*StyleBox[\(v\), \"TI\"]\) of \!\(\*StyleBox[\(g\), \"TI\"]\).\n",
+	"LocalDimensionality[",
+		"\!\(\*StyleBox[\(g\), \"TI\"]\), \!\(\*StyleBox[\(v\), \"TI\"]\), \!\(\*StyleBox[\(r\), \"TI\"]\)",
+	"] gives dimensionality of a ball with radius \!\(\*StyleBox[\(r\), \"TI\"]\) ",
+	"centered in the vertex \!\(\*StyleBox[\(v\), \"TI\"]\) of \!\(\*StyleBox[\(g\), \"TI\"]\)."
 };
 
 
@@ -555,6 +566,10 @@ AdjacencyList[graph_ ? OrientedGraphQ, v_, arg___] := AdjacencyList[$ToGraph @ g
 
 
 (* ::Section:: *)
+(*LocalDimensionality*)
+
+
+(* ::Section:: *)
 (*OrientedGraphIsomorphism*)
 
 
@@ -604,9 +619,10 @@ Attributes[OrientedGraphQ] = {ReadProtected};
 Attributes[OrientedGridGraph] = {ReadProtected};
 Attributes[WrappedAround] = {ReadProtected};
 Attributes[OrientedGraphIsomorphism] = {ReadProtected};
+Attributes[LocalDimensionality] = {ReadProtected};
 
 
-Protect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround, AdjacencyList, OrientedGraphIsomorphism];
+Protect[VertexPort, GraphPort, OrientedGraph, OrientedGraphQ, OrientedGridGraph, WrappedAround, AdjacencyList, LocalDimensionality, OrientedGraphIsomorphism];
 
 
 EndPackage[]
